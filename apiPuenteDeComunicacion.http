@@ -1,0 +1,6 @@
+@apiPuenteDeComunicacion_HostAddress = http://localhost:5239
+
+GET {{apiPuenteDeComunicacion_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

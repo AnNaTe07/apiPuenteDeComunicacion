@@ -274,7 +274,24 @@ namespace apiPuenteDeComunicacion.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UsuarioId");
+
                     b.ToTable("Mensajes");
+                });
+
+            modelBuilder.Entity("ApiPuenteDeComunicacion.Models.MensajeUsuario", b =>
+                {
+                    b.Property<int>("MensajeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("MensajeId", "UsuarioId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("MensajeUsuarios");
                 });
 
             modelBuilder.Entity("ApiPuenteDeComunicacion.Models.Nivel", b =>
@@ -359,31 +376,32 @@ namespace apiPuenteDeComunicacion.Migrations
                     b.Property<string>("Apellido")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Dni")
+                    b.Property<string>("Avatar")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("Dni")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MensajeId")
-                        .HasColumnType("int");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Nombre")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("email")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("password")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("rolId")
+                    b.Property<int>("RolId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Salt")
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MensajeId");
-
-                    b.HasIndex("rolId");
+                    b.HasIndex("RolId");
 
                     b.ToTable("Usuarios");
                 });
@@ -424,7 +442,7 @@ namespace apiPuenteDeComunicacion.Migrations
                         .IsRequired();
 
                     b.HasOne("ApiPuenteDeComunicacion.Models.Usuario", "Usuario")
-                        .WithMany("Alumnos")
+                        .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -510,15 +528,41 @@ namespace apiPuenteDeComunicacion.Migrations
                         .HasForeignKey("CursoId");
                 });
 
+            modelBuilder.Entity("ApiPuenteDeComunicacion.Models.Mensaje", b =>
+                {
+                    b.HasOne("ApiPuenteDeComunicacion.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ApiPuenteDeComunicacion.Models.MensajeUsuario", b =>
+                {
+                    b.HasOne("ApiPuenteDeComunicacion.Models.Mensaje", "Mensaje")
+                        .WithMany("Receptores")
+                        .HasForeignKey("MensajeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ApiPuenteDeComunicacion.Models.Usuario", "Usuario")
+                        .WithMany("MensajesRecibidos")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mensaje");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("ApiPuenteDeComunicacion.Models.Usuario", b =>
                 {
-                    b.HasOne("ApiPuenteDeComunicacion.Models.Mensaje", null)
-                        .WithMany("Receptores")
-                        .HasForeignKey("MensajeId");
-
                     b.HasOne("ApiPuenteDeComunicacion.Models.Rol", "Rol")
                         .WithMany()
-                        .HasForeignKey("rolId")
+                        .HasForeignKey("RolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -551,7 +595,7 @@ namespace apiPuenteDeComunicacion.Migrations
 
             modelBuilder.Entity("ApiPuenteDeComunicacion.Models.Usuario", b =>
                 {
-                    b.Navigation("Alumnos");
+                    b.Navigation("MensajesRecibidos");
                 });
 #pragma warning restore 612, 618
         }

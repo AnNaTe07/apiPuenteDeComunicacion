@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("apiPuenteDeComunicacion")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6fd8f439fdf4d7a47abf56ec9dff238b40456b80")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ac303c419f08dde64d52e68237604c6cc8d2f727")]
 [assembly: System.Reflection.AssemblyProductAttribute("apiPuenteDeComunicacion")]
 [assembly: System.Reflection.AssemblyTitleAttribute("apiPuenteDeComunicacion")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

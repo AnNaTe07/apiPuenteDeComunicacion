@@ -10,7 +10,8 @@ namespace ApiPuenteDeComunicacion.Models
         //Emisor
         [ForeignKey("UsuarioId")]
         public int UsuarioId { get; set; }
-        //receptores
-        public List<Usuario> Receptores { get; set; }
+        public Usuario Usuario { get; set; }
+        // Receptores(Relación muchos a muchos)
+        public List<MensajeUsuario> Receptores { get; set; } = new List<MensajeUsuario>();
     }
 }

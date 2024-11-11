@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 namespace ApiPuenteDeComunicacion.Models
 {
     public class Rol

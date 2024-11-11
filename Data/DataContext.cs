@@ -18,6 +18,25 @@ public class DataContext : DbContext
     public DbSet<Asistencia> Asistencias { get; set; }
     public DbSet<Calificacion> Calificaciones { get; set; }
     public DbSet<Mensaje> Mensajes { get; set; }
+    public DbSet<MensajeUsuario> MensajeUsuarios { get; set; }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // Configurar la relación muchos a muchos entre Usuario y Mensaje
+        modelBuilder.Entity<MensajeUsuario>()
+            .HasKey(mu => new { mu.MensajeId, mu.UsuarioId });  // Compuesta por las dos claves foráneas
+
+        modelBuilder.Entity<MensajeUsuario>()
+            .HasOne(mu => mu.Mensaje)
+            .WithMany(m => m.Receptores)
+            .HasForeignKey(mu => mu.MensajeId);
+
+        modelBuilder.Entity<MensajeUsuario>()
+            .HasOne(mu => mu.Usuario)
+            .WithMany(u => u.MensajesRecibidos)
+            .HasForeignKey(mu => mu.UsuarioId);
+    }
     public DbSet<EstadoAsistencia> EstadosAsistencias { get; set; }
     public DbSet<TipoActividad> TiposActividades { get; set; }
     public DbSet<Notificacion> Notificaciones { get; set; }

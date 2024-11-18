@@ -15,6 +15,18 @@ builder.Services.AddSwaggerGen();
 // Accedo a la configuración de Jwt desde appsettings.json
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
+// Configuración de CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()  // Permite solicitudes de cualquier origen
+              .AllowAnyMethod()  // Permite cualquier método HTTP (GET, POST, etc.)
+              .AllowAnyHeader(); // Permite cualquier cabecera
+    });
+});
+
+
 // Registra TokenUtils como un servicio
 builder.Services.AddScoped<TokenUtils>();
 
@@ -23,6 +35,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
 
 builder.WebHost.UseUrls("http://localhost:5000", "https://localhost:5239", "http://*:5000", "https://*:5239");
+
 
 var app = builder.Build();
 
@@ -56,6 +69,9 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
+
+// Usar la política CORS
+app.UseCors("AllowAll");
 
 app.Run();
 

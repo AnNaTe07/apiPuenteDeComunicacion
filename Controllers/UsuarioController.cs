@@ -1,10 +1,11 @@
 using ApiPuenteDeComunicacion.Data;
 using ApiPuenteDeComunicacion.Models;
 using ApiPuenteDeComunicacion.utils;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Globalization;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -49,21 +50,51 @@ public class UsuarioController : ControllerBase
     {
         var usuario = _context.Usuarios.Include(u => u.Rol).FirstOrDefault(u => u.Email == login.Email);
 
-        //si usuario no está registrado
+        // Si el usuario no está registrado
         if (usuario == null)
         {
             return Unauthorized("Credenciales inválidas.");
         }
 
-        //si el pass es incorrecto
+        // Si el pass es incorrecto
         if (!PasswordUtils.VerifyPassword(login.Password, usuario.Password, usuario.Salt))
         {
             return Unauthorized("Credenciales inválidas.");
         }
 
-        //genero el token jwt usando la clase TokenUtils
+        // genero el token JWT
         var token = _tokenUtils.GenerateJwtToken(usuario);
-        return Ok(token);
+
+        // decodifico el token para obtener los claims
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token); // decodifico el JWT
+
+        // cast explícito a JwtSecurityToken para acceder a los claims
+        if (jwtToken is JwtSecurityToken tokenClaims)
+        {
+            //extraigo valores de los claims
+            var role = tokenClaims?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            var fullName = tokenClaims?.Claims.FirstOrDefault(c => c.Type == "FullName")?.Value;
+            var email = tokenClaims?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var id = tokenClaims?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var expirationTime = jwtToken?.ValidTo;
+            // Convertir expirationTime (DateTime) a un string con el formato correcto
+            var expirationTimeString = expirationTime?.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
+
+
+            // retorno el JSON con todos los datos
+            return Ok(new
+            {
+                Token = token,
+                Expiracion = expirationTimeString,
+                Rol = role,
+                FullName = fullName,
+                Email = email,
+                Id = id
+            });
+        }
+
+        return Unauthorized("Token no válido.");
     }
 
 

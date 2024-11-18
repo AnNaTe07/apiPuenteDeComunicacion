@@ -37,12 +37,14 @@ namespace ApiPuenteDeComunicacion.utils
 
             var creds = new SigningCredentials(keyBytes, SecurityAlgorithms.HmacSha256);
 
+            var expirationTime = DateTime.Now.AddMinutes(30);
+            //var expirationTime = DateTime.Now.AddDays(15);
             //creo el token
             var token = new JwtSecurityToken(
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.Now.AddDays(15),
+                expires: expirationTime,
                 signingCredentials: creds
             );
             //retorno el token como una cadena

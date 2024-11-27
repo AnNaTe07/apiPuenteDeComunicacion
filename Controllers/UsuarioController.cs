@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
+using System.Linq.Expressions;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -96,6 +98,29 @@ public class UsuarioController : ControllerBase
 
         return Unauthorized("Token no válido.");
     }
+
+    [HttpGet("profile")]
+    [Authorize]
+    public async Task<IActionResult> Profile()
+    {
+        try
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _context.Usuarios.Include(u => u.Rol).SingleOrDefaultAsync(e => e.Email == email);
+
+            if (user == null)
+            {
+                return NotFound("No se encontró el perfil de usuario.");
+            }
+
+            return Ok(user);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Error al obtener los datos del perfil.");
+        }
+    }
+
 
 
 }

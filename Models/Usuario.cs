@@ -19,7 +19,7 @@ namespace ApiPuenteDeComunicacion.Models
 
         [ForeignKey("rolId")]
         public int RolId { get; set; }
-        [JsonIgnore]
+
         public Rol? Rol { get; set; }
         public string? Avatar { get; set; }
         public string NombreCompleto => $"{Nombre} {Apellido}";

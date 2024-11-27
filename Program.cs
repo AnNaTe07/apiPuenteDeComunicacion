@@ -2,6 +2,9 @@ using System.Runtime.Versioning;
 using ApiPuenteDeComunicacion.Data;
 using Microsoft.EntityFrameworkCore;
 using ApiPuenteDeComunicacion.utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +30,31 @@ builder.Services.AddCors(options =>
 });
 
 
+// Configuración de JWT
+
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false; // Cambiar a true en producción
+    x.SaveToken = true;
+
+    var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"]
+    };
+});
+
+
 // Registra TokenUtils como un servicio
 builder.Services.AddScoped<TokenUtils>();
 
@@ -38,6 +66,9 @@ builder.WebHost.UseUrls("http://localhost:5000", "https://localhost:5239", "http
 
 
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();//para mapear los controladores
 
